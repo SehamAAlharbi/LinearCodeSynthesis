@@ -77,5 +77,9 @@ public class Method {
 		}
 		return isFound;
 	}
+	
+	public String toString() {
+		return "Method Name: " + this.getName() + " Meathod Annotation: " + this.getAnnotation() ;
+	}
 
 }

@@ -1,6 +1,6 @@
 package seham.phd.synthesis.code.concise;
 
-import javax.swing.JFrame;
+import javax.swing.JFrame;	
 
 import seham.phd.synthesis.annotations.*;
 
