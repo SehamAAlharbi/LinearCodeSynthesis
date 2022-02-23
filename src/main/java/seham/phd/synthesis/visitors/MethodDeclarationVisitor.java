@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -15,8 +16,20 @@ import seham.phd.synthesis.model.MethodDeclarationRepresenter;
 
 public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
-	private static ArrayList<MethodDeclaration> allMethodDeclarations = new ArrayList<MethodDeclaration>();
+	private ArrayList<MethodDeclaration> allMethodDeclarations = new ArrayList<MethodDeclaration>();
+	private ArrayList<MethodDeclaration> utilityMethods = new ArrayList<MethodDeclaration>();
+	private ArrayList<MethodDeclaration> documentationMethods = new ArrayList<MethodDeclaration>();
 
+	
+	public void parse(File file) throws FileNotFoundException {
+
+		CompilationUnit cu = StaticJavaParser.parse(file);
+		visit(cu, null);
+		locateUtilityMethods();
+		locateDocumentationMethods ();
+
+	} 
+	
 	@Override
 	public void visit(MethodDeclaration md, Void arg) {
 		super.visit(md, arg);
@@ -25,31 +38,18 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	public ArrayList<MethodDeclaration> getUtilityMethods() {
 
-		ArrayList<MethodDeclaration> utilityMethods = new ArrayList<MethodDeclaration>();
-
-		// use streams for better practice
-		for (MethodDeclaration declaration : allMethodDeclarations) {
-			if (declaration.isAnnotationPresent("Utility")) {
-				utilityMethods.add(declaration);
-			}
-		}
-
-		return utilityMethods;
+		return this.utilityMethods;
 	}
 
 	public ArrayList<MethodDeclaration> getDocumentationMethods() {
 
-		ArrayList<MethodDeclaration> documentationMethods = new ArrayList<MethodDeclaration>();
+		return this.documentationMethods;
 
-		// use streams for better practice
-		for (MethodDeclaration declaration : allMethodDeclarations) {
-			if (declaration.isAnnotationPresent("Documentation")) {
-				documentationMethods.add(declaration);
-			}
-		}
+	}
+	
+	public ArrayList<MethodDeclaration> getAllMethodDeclarations () {
 
-		return documentationMethods;
-
+		return this.allMethodDeclarations;
 	}
 
 	public Map<MethodCallExpr, Integer> locateUtilityCalls(MethodDeclarationRepresenter documentationmethod) {
@@ -58,12 +58,26 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 		return null;
 	}
+	
+	private void locateUtilityMethods() {
 
-	public void parse(File file) throws FileNotFoundException {
-
-		CompilationUnit cu = StaticJavaParser.parse(file);
-		visit(cu, null);
+		// use streams for better practice
+		utilityMethods.addAll(allMethodDeclarations.stream().filter(declaration -> declaration.isAnnotationPresent("Utility")).collect(Collectors.toList()));
+//		for (MethodDeclaration declaration : allMethodDeclarations) {
+//			if (declaration.isAnnotationPresent("Utility")) {
+//				utilityMethods.add(declaration);
+//			}
+//		}
 
 	}
+	
+	private void locateDocumentationMethods() {
 
+		// use streams for better practice
+		for (MethodDeclaration declaration : allMethodDeclarations) {
+			if (declaration.isAnnotationPresent("Documentation")) {
+				documentationMethods.add(declaration);
+			}
+		}
+	}
 }

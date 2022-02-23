@@ -21,30 +21,43 @@ public class MethodDeclarationVisitorTest {
 	
 	// code executed before all test methods, executed once only, e.g DB connection or instance creation
 	@BeforeClass
-	public static void setUpClass() {
+	public static void setUpClass() throws FileNotFoundException {
 		visitor = new MethodDeclarationVisitor();
 	    file = new File (FILE_PATH);
+		visitor.parse(file);
 	}
 	
 	// code executed before each test methods, code that needed to be executed repeatedly before each method
 	@Before
 	public void setUp() {
-		
+	
 	}
 	
 	@Test
 	public void testParse() throws FileNotFoundException {
 		
-		int size = 2;
-		visitor.parse(file);
+		int size = 4;
+		int actualSize = visitor.getAllMethodDeclarations().size ();
+		assertEquals(size,actualSize);
+		System.out.println("Total Number of Method Declarations: " + actualSize);
 		
-		System.out.println(visitor.getDocumentationMethods().size());
-		assertEquals(size,visitor.getDocumentationMethods().size());
+	}
+	
+	@Test
+	public void testGetUtilityMethods() throws FileNotFoundException {
+		
+		int actualSize = visitor.getUtilityMethods().size();
+		assertTrue(actualSize == 2);
+		System.out.println("Number of Utility Methods: " +  actualSize );
+		
+	}
+	
+	@Test
+	public void testGetDocumentationMethods() throws FileNotFoundException {
 		
 		int actualSize = visitor.getDocumentationMethods().size();
 		assertTrue(actualSize == 2);
-		
-		System.out.println(visitor.getDocumentationMethods());
+		System.out.println("Number of Documentation Methods: " +  actualSize );
 		
 	}
 	
