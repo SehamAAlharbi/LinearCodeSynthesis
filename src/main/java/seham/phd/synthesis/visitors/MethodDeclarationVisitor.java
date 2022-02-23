@@ -3,6 +3,7 @@ package seham.phd.synthesis.visitors;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,16 +21,15 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	private ArrayList<MethodDeclaration> utilityMethods = new ArrayList<MethodDeclaration>();
 	private ArrayList<MethodDeclaration> documentationMethods = new ArrayList<MethodDeclaration>();
 
-	
 	public void parse(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
 		visit(cu, null);
 		locateUtilityMethods();
-		locateDocumentationMethods ();
+		locateDocumentationMethods();
 
-	} 
-	
+	}
+
 	@Override
 	public void visit(MethodDeclaration md, Void arg) {
 		super.visit(md, arg);
@@ -46,38 +46,65 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		return this.documentationMethods;
 
 	}
-	
-	public ArrayList<MethodDeclaration> getAllMethodDeclarations () {
+
+	public ArrayList<MethodDeclaration> getAllMethodDeclarations() {
 
 		return this.allMethodDeclarations;
 	}
 
-	public Map<MethodCallExpr, Integer> locateUtilityCalls(MethodDeclarationRepresenter documentationmethod) {
+	/**
+	 * Given a documentation method, it analysis its body and look for any utility MethodCallExpr
+	 * 
+	 * @param documentationMethod to be analysed
+	 * @return a map of each utility MethodCallExpr and its line number
+	 * 
+	 */
+	public Map<MethodCallExpr, Integer> locateUtilityCalls(MethodDeclaration documentationMethod) {
 
-		// given a doc method, analysis its body, returns a map of each method call and its line number
+		Map<MethodCallExpr, Integer> utilityCalls = new HashMap<MethodCallExpr, Integer>();
 
-		return null;
+		documentationMethod.findAll(MethodCallExpr.class).forEach(mce -> {
+			if (isUtilityMethodCall(mce)) {
+				utilityCalls.put(mce, mce.getName().getBegin().get().line);
+			}
+		});
+
+		return utilityCalls;
 	}
-	
+
 	private void locateUtilityMethods() {
 
-		// use streams for better practice
-		utilityMethods.addAll(allMethodDeclarations.stream().filter(declaration -> declaration.isAnnotationPresent("Utility")).collect(Collectors.toList()));
-//		for (MethodDeclaration declaration : allMethodDeclarations) {
-//			if (declaration.isAnnotationPresent("Utility")) {
-//				utilityMethods.add(declaration);
-//			}
-//		}
+		utilityMethods.addAll(allMethodDeclarations.stream()
+				.filter(declaration -> declaration.isAnnotationPresent("Utility")).collect(Collectors.toList()));
 
 	}
-	
+
 	private void locateDocumentationMethods() {
 
-		// use streams for better practice
-		for (MethodDeclaration declaration : allMethodDeclarations) {
-			if (declaration.isAnnotationPresent("Documentation")) {
-				documentationMethods.add(declaration);
-			}
+		documentationMethods.addAll(allMethodDeclarations.stream()
+				.filter(declaration -> declaration.isAnnotationPresent("Documentation")).collect(Collectors.toList()));
+
+	}
+
+	private boolean isUtilityMethodCall(MethodCallExpr methodCall) {
+
+		MethodDeclaration isFound = utilityMethods.stream()
+				.filter(md -> md.getNameAsString().equals(methodCall.getNameAsString())).findAny().orElse(null);
+		if (isFound != null) {
+			return true;
 		}
+
+		return false;
+	}
+
+	private boolean isDocumentationMethodCall(MethodCallExpr methodCall) {
+
+		MethodDeclaration isFound = documentationMethods.stream()
+				.filter(md -> md.getNameAsString().equals(methodCall.getNameAsString())).findAny().orElse(null);
+		if (isFound != null) {
+			return true;
+		}
+
+		return false;
 	}
 }

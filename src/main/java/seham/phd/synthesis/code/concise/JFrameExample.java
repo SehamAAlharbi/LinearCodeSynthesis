@@ -10,6 +10,7 @@ public class JFrameExample {
 	public void docFrameWithoutTitle() {
 		JFrame frame = createJFrame(false);
 		show(frame);
+		System.out.println();
 	}
 
 	@Documentation

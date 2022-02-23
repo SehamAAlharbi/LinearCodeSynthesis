@@ -44,6 +44,16 @@ public class MethodDeclarationVisitorTest {
 	}
 	
 	@Test
+	public void testGetAllMethodDeclarations() {
+		
+		int size = 4;
+		int actualSize = visitor.getAllMethodDeclarations().size ();
+		assertEquals(size,actualSize);
+		System.out.println("Total Number of Method Declarations: " + actualSize);
+
+	}
+	
+	@Test
 	public void testGetUtilityMethods() throws FileNotFoundException {
 		
 		int actualSize = visitor.getUtilityMethods().size();
@@ -58,6 +68,7 @@ public class MethodDeclarationVisitorTest {
 		int actualSize = visitor.getDocumentationMethods().size();
 		assertTrue(actualSize == 2);
 		System.out.println("Number of Documentation Methods: " +  actualSize );
+		
 		
 	}
 	
