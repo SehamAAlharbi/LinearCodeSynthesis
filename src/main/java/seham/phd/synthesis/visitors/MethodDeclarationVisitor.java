@@ -1,6 +1,6 @@
 package seham.phd.synthesis.visitors;
 
-import java.io.File;
+import java.io.File;	
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,27 +13,34 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
-import seham.phd.synthesis.model.MethodDeclarationRepresenter;
-
 public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	private ArrayList<MethodDeclaration> allMethodDeclarations = new ArrayList<MethodDeclaration>();
 	private ArrayList<MethodDeclaration> utilityMethods = new ArrayList<MethodDeclaration>();
 	private ArrayList<MethodDeclaration> documentationMethods = new ArrayList<MethodDeclaration>();
 
-	public void parse(File file) throws FileNotFoundException {
+	public CompilationUnit parse(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
-		visit(cu, null);
-		locateUtilityMethods();
-		locateDocumentationMethods();
+//		visit(cu, null);
+//		locateUtilityMethods();
+//		locateDocumentationMethods();
+	
+		return cu;
 
 	}
 
 	@Override
 	public void visit(MethodDeclaration md, Void arg) {
+		
 		super.visit(md, arg);
 		allMethodDeclarations.add(md);
+		
+	}
+	
+	public ArrayList<MethodDeclaration> getAllMethodDeclarations() {
+
+		return this.allMethodDeclarations;
 	}
 
 	public ArrayList<MethodDeclaration> getUtilityMethods() {
@@ -47,14 +54,9 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	}
 
-	public ArrayList<MethodDeclaration> getAllMethodDeclarations() {
-
-		return this.allMethodDeclarations;
-	}
 
 	/**
 	 * Given a documentation method, it analysis its body and look for any utility MethodCallExpr
-	 * 
 	 * @param documentationMethod to be analysed
 	 * @return a map of each utility MethodCallExpr and its line number
 	 * 
@@ -72,14 +74,14 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		return utilityCalls;
 	}
 
-	private void locateUtilityMethods() {
+	public void locateUtilityMethods() {
 
 		utilityMethods.addAll(allMethodDeclarations.stream()
 				.filter(declaration -> declaration.isAnnotationPresent("Utility")).collect(Collectors.toList()));
 
 	}
 
-	private void locateDocumentationMethods() {
+	public void locateDocumentationMethods() {
 
 		documentationMethods.addAll(allMethodDeclarations.stream()
 				.filter(declaration -> declaration.isAnnotationPresent("Documentation")).collect(Collectors.toList()));
