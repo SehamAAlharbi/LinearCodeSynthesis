@@ -23,9 +23,6 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	public CompilationUnit parse(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
-//		visit(cu, null);
-//		locateUtilityMethods();
-//		locateDocumentationMethods();
 	
 		return cu;
 
