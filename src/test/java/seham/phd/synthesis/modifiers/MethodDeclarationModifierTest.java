@@ -1,6 +1,6 @@
 package seham.phd.synthesis.modifiers;
 
-import java.io.File;	
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.junit.After;
@@ -10,43 +10,48 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.visitor.Visitable;
 
 import seham.phd.synthesis.visitors.MethodDeclarationVisitor;
 
-public class IntegerLiteralModifierTest {
+public class MethodDeclarationModifierTest {
 	
 	final static String FILE_PATH = "src/main/java/seham/phd/synthesis/code/concise/JFrameExample.java";
 	static File file ;
-	static MethodDeclarationVisitor visitor;
-	static IntegerLiteralModifier modifier;
+    static MethodDeclarationVisitor visitor;
+    static MethodDeclarationModifier modifier;
 	
-	@BeforeClass
+    @BeforeClass
 	public static void setUpClass() throws FileNotFoundException {
 		
 		file = new File (FILE_PATH);
 
 	}
-	
+    
 	@Before
 	public void setUp() {
 		
 		visitor = new MethodDeclarationVisitor();
-		modifier = new IntegerLiteralModifier ();
+		modifier = new MethodDeclarationModifier ();
 	
 	}
+	
 	
 	@Test
-	public void testVisit() throws FileNotFoundException {
+	public void testClone() throws FileNotFoundException {
 		
 		CompilationUnit cu = visitor.parse(file);
-		modifier.visit(cu, null);
-		System.out.println(cu.toString());
+		visitor.visit(cu , null);
+		visitor.locateUtilityMethods(); 
+		Visitable clonedBody = modifier.cloneBody(visitor.getUtilityMethods().get(0));
+		System.out.println(clonedBody.toString());
 		
 	}
+	
 	
 	@After
 	public void tearDown() {
-	
+
 	}
 	
 	@AfterClass

@@ -1,6 +1,6 @@
 package seham.phd.synthesis.code.concise;
 
-import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.EcorePackage;	
 import org.eclipse.epsilon.emc.emf.EmfModel;
 import org.eclipse.epsilon.eol.EolModule;
 import org.eclipse.epsilon.eol.exceptions.EolRuntimeException;

@@ -13,6 +13,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
+
 public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	private ArrayList<MethodDeclaration> allMethodDeclarations = new ArrayList<MethodDeclaration>();

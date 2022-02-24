@@ -1,9 +1,8 @@
 package seham.phd.synthesis.modifiers;
 
-import java.util.regex.Pattern;
+import java.util.regex.Pattern;		
 
 import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 
 public class IntegerLiteralModifier extends ModifierVisitor<Void> {
