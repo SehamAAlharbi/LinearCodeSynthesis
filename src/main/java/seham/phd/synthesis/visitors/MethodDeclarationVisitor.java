@@ -1,7 +1,10 @@
 package seham.phd.synthesis.visitors;
 
-import java.io.File;	
+import java.io.File;		
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +14,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
 
@@ -106,5 +110,14 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		}
 
 		return false;
+	}
+	
+	public void printUsingDot(CompilationUnit cu) throws IOException {
+		
+		DotPrinter printer = new DotPrinter(true);
+		try (FileWriter fileWriter = new FileWriter("ast.dot");
+				PrintWriter printWriter = new PrintWriter(fileWriter)) {
+			printWriter.print(printer.output(cu));
+		}
 	}
 }

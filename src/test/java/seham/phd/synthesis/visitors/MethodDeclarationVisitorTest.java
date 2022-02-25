@@ -1,10 +1,11 @@
 package seham.phd.synthesis.visitors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;	
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,18 +21,23 @@ public class MethodDeclarationVisitorTest {
 	final static String FILE_PATH = "src/main/java/seham/phd/synthesis/code/concise/JFrameExample.java";
 	static File file;
 	static MethodDeclarationVisitor visitor;
-
-	// code executed before all test methods, executed once only, e.g DB connection
-	// or instance creation
+	
+	/**
+	 * code executed before all test methods, executed once only, e.g DB connection
+	 * or instance creation
+	 * @throws FileNotFoundException
+	 */
 	@BeforeClass
 	public static void setUpClass() throws FileNotFoundException {
 
 		file = new File(FILE_PATH);
 
 	}
-
-	// code executed before each test methods, code that needed to be executed
-	// repeatedly before each method
+	
+	/**
+	 * code executed before each test methods, code that needed to be executed
+	 * repeatedly before each method
+	 */
 	@Before
 	public void setUp() {
 
@@ -87,17 +93,28 @@ public class MethodDeclarationVisitorTest {
 		System.out.println("Number of Documentation Methods: " + actualSize);
 
 	}
+	
+	@Test 
+	public void testPrintUsingDot () throws IOException {
+		
+		CompilationUnit cu = visitor.parse(file);
+		visitor.printUsingDot(cu);
+	}
 
-	// code executed after each test method, code executed repeatedly after other
-	// test methods
+	/**
+	 * code executed after each test method, code executed repeatedly after other
+	 test methods
+	 */
 	@After
 	public void tearDown() {
 
 	}
 
+	/**
+	 * code executed after all test methods, executed once, e.g DB disconnection,
+	 * clean up test environment, making instance equal null after using it.
+	 */
 	@AfterClass
-	// code executed after all test methods, executed once, e.g DB disconnection,
-	// clean up test environment, making instance equal null after using it.
 	public static void tearDownClass() {
 		visitor = null;
 	}

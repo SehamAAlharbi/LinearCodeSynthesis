@@ -1,6 +1,6 @@
 package seham.phd.synthesis.modifiers;
 
-import java.io.File;
+import java.io.File;	
 import java.io.FileNotFoundException;
 
 import org.junit.After;
@@ -37,7 +37,7 @@ public class MethodDeclarationModifierTest {
 	}
 	
 	
-	@Test
+//	@Test
 	public void testClone() throws FileNotFoundException {
 		
 		CompilationUnit cu = visitor.parse(file);
@@ -45,6 +45,35 @@ public class MethodDeclarationModifierTest {
 		visitor.locateUtilityMethods(); 
 		Visitable clonedBody = modifier.cloneBody(visitor.getUtilityMethods().get(0));
 		System.out.println(clonedBody.toString());
+		
+	}
+	
+	@Test
+	public void testModify () throws FileNotFoundException {
+		
+		CompilationUnit cu = visitor.parse(file);
+		visitor.visit(cu , null);
+		
+		visitor.locateUtilityMethods();
+		visitor.locateDocumentationMethods();
+		
+		modifier.modify(visitor.getDocumentationMethods().get(0), visitor.getUtilityMethods().get(0));
+		System.out.println(cu.toString());
+
+		
+	}
+	
+//	@Test
+	public void testRemoveNode() throws FileNotFoundException {
+		
+		CompilationUnit cu = visitor.parse(file);
+		visitor.visit(cu , null);
+		
+		visitor.locateUtilityMethods();
+		visitor.locateDocumentationMethods();
+		
+		modifier.removeNode(visitor.getDocumentationMethods().get(0).getBody().get(), 0);
+		System.out.println(cu.toString());
 		
 	}
 	

@@ -1,6 +1,6 @@
 package seham.phd.synthesis.modifiers;
 
-import java.io.File;	
+import java.io.File;		
 import java.io.FileNotFoundException;
 
 import org.junit.After;
