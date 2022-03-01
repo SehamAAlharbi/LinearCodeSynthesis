@@ -1,6 +1,6 @@
 package seham.phd.synthesis.visitors;
 
-import static org.junit.Assert.assertEquals;	
+import static org.junit.Assert.assertEquals;		
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.javaparser.ast.CompilationUnit;
+
 
 public class MethodDeclarationVisitorTest {
 

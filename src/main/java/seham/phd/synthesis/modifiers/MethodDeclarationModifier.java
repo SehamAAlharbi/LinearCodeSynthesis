@@ -36,7 +36,7 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 		System.out.println(utilityMethodBody);
 		
-		// Iterate over both @Param utilityMethod body and embed statements to @Param md body 
+		// Iterate over @Param utilityMethod body and embed statements to @Param md body 
 		NodeList<Statement> statements =  utilityMethodBody.getStatements();
 		statements.stream().forEach(st -> md.getBody().get().addStatement(st));
 		
