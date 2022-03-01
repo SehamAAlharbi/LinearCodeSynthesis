@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import com.github.javaparser.ast.CompilationUnit;
 
-
 public class MethodDeclarationVisitorTest {
 
 	// usually static, so it could be instantiate in the static setUp method
