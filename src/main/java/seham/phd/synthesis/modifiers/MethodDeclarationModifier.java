@@ -1,13 +1,26 @@
 package seham.phd.synthesis.modifiers;
 
-import com.github.javaparser.ast.NodeList;
+import java.util.Map;
+
+import com.github.javaparser.Position;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;	
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 
+import seham.phd.synthesis.visitors.MethodDeclarationVisitor;
+
+
 public class MethodDeclarationModifier extends ModifierVisitor<Void> {
+	
+	public MethodDeclarationModifier() {
+		
+	}
 
 	@Override
 	public MethodDeclaration visit(MethodDeclaration md, Void arg) {
@@ -27,24 +40,49 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 	}
 	
-	public MethodDeclaration modify (MethodDeclaration md, MethodDeclaration utilityMethod) {
+	public MethodDeclaration modifyAllDocMethods(MethodDeclarationVisitor visitor) {
+		
+		// This is what should happen, change all Doc methods in the CU of this visitor
+//		visitor.getDocumentationMethods().stream().forEach(method -> modifyMethod(method, visitor));
+		
+		// here I am just experimenting with one method doc
+		MethodDeclaration md = modifyMethod(visitor.getDocumentationMethods().get(0), visitor);
+		return md;
+		
+	}
+	
+	private MethodDeclaration modifyMethod (MethodDeclaration md, MethodDeclarationVisitor visitor) {
 		
 		super.visit(md, null);
 		
-		removeNode(md.getBody().get(), 0);
-		BlockStmt utilityMethodBody = cloneBody(utilityMethod);
 		
-		System.out.println(utilityMethodBody);
+		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
+		BlockStmt newDocMethodBody = new BlockStmt();
 		
-		// Iterate over @Param utilityMethod body and embed statements to @Param md body 
-		NodeList<Statement> statements =  utilityMethodBody.getStatements();
-		statements.stream().forEach(st -> md.getBody().get().addStatement(st));
+		utilityCallsMap.keySet().forEach(k -> {
+			
+			    // clone each utility method body
+				BlockStmt utilityMethodBody = cloneBody(k);
+
+				// Iterate over @Param utilityMethod body and embed statements to @Param md body
+				NodeList<Statement> statements =  utilityMethodBody.getStatements();
+				
+				md.getBody().get().findAll(MethodCallExpr.class).stream().forEach(mce -> {
+					
+					if (mce.getNameAsString().equalsIgnoreCase(k.getNameAsString())) {
+						statements.stream().forEach(st -> newDocMethodBody.addStatement(st));
+					}
+				});
+
+		});
+		
+		md.replace(md.getBody().get(), newDocMethodBody);
 		
 		return md;
 		
 	}
 	
-	public int getInsertionPosition () {
+	public int getInsertionPosition (int lineNumber) {
 		
 		int position = 0;
 		

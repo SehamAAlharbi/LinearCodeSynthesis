@@ -98,7 +98,7 @@ public class MethodDeclarationVisitorTest {
 	public void testPrintUsingDot () throws IOException {
 		
 		CompilationUnit cu = visitor.parse(file);
-		visitor.printUsingDot(cu);
+		visitor.printUsingDot(cu, "ast.dot");
 	}
 
 	/**

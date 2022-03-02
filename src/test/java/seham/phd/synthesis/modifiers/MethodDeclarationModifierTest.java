@@ -2,6 +2,7 @@ package seham.phd.synthesis.modifiers;
 
 import java.io.File;	
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -49,7 +50,7 @@ public class MethodDeclarationModifierTest {
 	}
 	
 	@Test
-	public void testModify () throws FileNotFoundException {
+	public void testModify () throws IOException {
 		
 		CompilationUnit cu = visitor.parse(file);
 		visitor.visit(cu , null);
@@ -57,9 +58,9 @@ public class MethodDeclarationModifierTest {
 		visitor.locateUtilityMethods();
 		visitor.locateDocumentationMethods();
 		
-		modifier.modify(visitor.getDocumentationMethods().get(0), visitor.getUtilityMethods().get(0));
+		modifier.modifyAllDocMethods(visitor);
+		
 		System.out.println(cu.toString());
-
 		
 	}
 	

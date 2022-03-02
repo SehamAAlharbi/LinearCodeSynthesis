@@ -31,6 +31,10 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		return cu;
 
 	}
+	
+	public MethodDeclarationVisitor() {
+		super();
+	}
 
 	@Override
 	public void visit(MethodDeclaration md, Void arg) {
@@ -60,16 +64,17 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	/**
 	 * Given a documentation method, it analysis its body and look for any utility MethodCallExpr
 	 * @param documentationMethod to be analysed
-	 * @return a map of each utility MethodCallExpr and its line number
+	 * @return a map of the whole utility MethodDeclaration node and the line number of its call in source code
 	 * 
 	 */
-	public Map<MethodCallExpr, Integer> locateUtilityCalls(MethodDeclaration documentationMethod) {
+	public Map<MethodDeclaration, Integer> locateUtilityCalls(MethodDeclaration documentationMethod) {
 
-		Map<MethodCallExpr, Integer> utilityCalls = new HashMap<MethodCallExpr, Integer>();
+		Map<MethodDeclaration, Integer> utilityCalls = new HashMap<MethodDeclaration, Integer>();
 
 		documentationMethod.findAll(MethodCallExpr.class).forEach(mce -> {
 			if (isUtilityMethodCall(mce)) {
-				utilityCalls.put(mce, mce.getName().getBegin().get().line);
+				MethodDeclaration utilityMethod = utilityMethods.stream().filter(md -> md.getNameAsString().equals(mce.getNameAsString())).findAny().orElse(null);
+				utilityCalls.put(utilityMethod, mce.getName().getBegin().get().line);
 			}
 		});
 
@@ -112,10 +117,10 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		return false;
 	}
 	
-	public void printUsingDot(CompilationUnit cu) throws IOException {
+	public void printUsingDot(CompilationUnit cu, String fileName) throws IOException {
 		
 		DotPrinter printer = new DotPrinter(true);
-		try (FileWriter fileWriter = new FileWriter("ast.dot");
+		try (FileWriter fileWriter = new FileWriter(fileName);
 				PrintWriter printWriter = new PrintWriter(fileWriter)) {
 			printWriter.print(printer.output(cu));
 		}
