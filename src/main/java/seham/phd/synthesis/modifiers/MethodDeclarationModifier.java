@@ -40,13 +40,14 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 	}
 	
-	public MethodDeclaration modifyAllDocMethods(MethodDeclarationVisitor visitor) {
+	public MethodDeclaration modifyAllDocMethods(CompilationUnit cu, MethodDeclarationVisitor visitor) {
 		
 		// This is what should happen, change all Doc methods in the CU of this visitor
 //		visitor.getDocumentationMethods().stream().forEach(method -> modifyMethod(method, visitor));
 		
 		// here I am just experimenting with one method doc
 		MethodDeclaration md = modifyMethod(visitor.getDocumentationMethods().get(0), visitor);
+		cu.recalculatePositions();
 		return md;
 		
 	}

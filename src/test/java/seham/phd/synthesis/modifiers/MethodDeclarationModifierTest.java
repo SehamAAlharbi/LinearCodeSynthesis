@@ -58,7 +58,7 @@ public class MethodDeclarationModifierTest {
 		visitor.locateUtilityMethods();
 		visitor.locateDocumentationMethods();
 		
-		modifier.modifyAllDocMethods(visitor);
+		modifier.modifyAllDocMethods(cu, visitor);
 		
 		System.out.println(cu.toString());
 		
