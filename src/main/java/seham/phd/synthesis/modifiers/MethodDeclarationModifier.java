@@ -1,5 +1,7 @@
 package seham.phd.synthesis.modifiers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.github.javaparser.Position;
@@ -67,17 +69,36 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 				// Iterate over @Param utilityMethod body and embed statements to @Param md body
 				NodeList<Statement> statements =  utilityMethodBody.getStatements();
+				List <Integer> nodesToRemove = new ArrayList <Integer> ();
 				
-				md.getBody().get().findAll(MethodCallExpr.class).stream().forEach(mce -> {
+				md.getBody().get().getChildNodes().forEach(node -> {
 					
-					if (mce.getNameAsString().equalsIgnoreCase(k.getNameAsString())) {
-						statements.stream().forEach(st -> newDocMethodBody.addStatement(st));
+					if (node.getRange().get().begin.line == utilityCallsMap.get(k)) {
+						
+						nodesToRemove.add(md.getBody().get().getChildNodes().indexOf(node));
 					}
+					
+				
 				});
+				
+//				 iterate to remove and add
+				nodesToRemove.stream().forEach(index -> {
+					md.getBody().get().getStatements().get(index).remove();
+//					statements.stream().forEach(st -> md.getBody().get().getStatements().add(index, st));
+				});
+				
+				
+				
+//				md.getBody().get().findAll(MethodCallExpr.class).stream().forEach(mce -> {
+//					
+//					if (mce.getNameAsString().equalsIgnoreCase(k.getNameAsString())) {
+//						statements.stream().forEach(st -> newDocMethodBody.addStatement(st));
+//					}
+//				});
 
 		});
 		
-		md.replace(md.getBody().get(), newDocMethodBody);
+//		md.replace(md.getBody().get(), newDocMethodBody);
 		
 		return md;
 		
