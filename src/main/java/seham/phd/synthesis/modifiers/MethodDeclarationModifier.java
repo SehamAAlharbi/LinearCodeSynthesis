@@ -60,7 +60,9 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 		
 		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
-		BlockStmt newDocMethodBody = new BlockStmt();
+		BlockStmt newDocMethodBody = md.getBody().get().clone();
+		List <Integer> nodesToRemove = new ArrayList <Integer> ();
+		List <Integer> nodesToKeep = new ArrayList <Integer> ();
 		
 		utilityCallsMap.keySet().forEach(k -> {
 			
@@ -69,36 +71,33 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 				// Iterate over @Param utilityMethod body and embed statements to @Param md body
 				NodeList<Statement> statements =  utilityMethodBody.getStatements();
-				List <Integer> nodesToRemove = new ArrayList <Integer> ();
-				
+			
 				md.getBody().get().getChildNodes().forEach(node -> {
+					
+					int index;
 					
 					if (node.getRange().get().begin.line == utilityCallsMap.get(k)) {
 						
-						nodesToRemove.add(md.getBody().get().getChildNodes().indexOf(node));
+						index = md.getBody().get().getChildNodes().indexOf(node);
+						newDocMethodBody.getStatement(index).remove();
+						newDocMethodBody.getStatements().addAll(index, statements);
+//						statements.stream().forEach(st -> newDocMethodBody.getStatements().add(index, st));
 					}
 					
 				
 				});
-				
-//				 iterate to remove and add
-				nodesToRemove.stream().forEach(index -> {
-					md.getBody().get().getStatements().get(index).remove();
-//					statements.stream().forEach(st -> md.getBody().get().getStatements().add(index, st));
-				});
-				
-				
-				
-//				md.getBody().get().findAll(MethodCallExpr.class).stream().forEach(mce -> {
-//					
-//					if (mce.getNameAsString().equalsIgnoreCase(k.getNameAsString())) {
-//						statements.stream().forEach(st -> newDocMethodBody.addStatement(st));
-//					}
-//				});
+
 
 		});
 		
-//		md.replace(md.getBody().get(), newDocMethodBody);
+		
+////		 iterate to remove and add
+//		nodesToRemove.stream().forEach(index -> {
+//			newDocMethodBody.getStatements().get(index).remove();
+//			statements.stream().forEach(st -> md.getBody().get().getStatements().add(index, st));
+//		});
+		
+		md.replace(md.getBody().get(), newDocMethodBody);
 		
 		return md;
 		
