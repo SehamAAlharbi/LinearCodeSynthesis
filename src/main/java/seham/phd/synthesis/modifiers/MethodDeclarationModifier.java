@@ -43,18 +43,16 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 	}
 	
-	public MethodDeclaration modifyAllDocMethods(CompilationUnit cu, MethodDeclarationVisitor visitor) {
+	public MethodDeclaration modifyAllDocMethods(MethodDeclarationVisitor visitor) {
 		
 		// This is what should happen, change all Doc methods in the CU of this visitor
-//		visitor.getDocumentationMethods().stream().forEach(method -> modifyMethod(method, visitor));
+//		visitor.getDocumentationMethods().stream().forEach(method -> modifyMethod(method, visitor.locateUtilityCalls(method)));
 		
 		// here I am just experimenting with one method doc
 		MethodDeclaration md = visitor.getDocumentationMethods().get(0);
 		Map<Integer, MethodDeclaration > utilityCallsMap = visitor.locateUtilityCalls(md);
-		
 		modifyMethod (md,utilityCallsMap);
-		
-		cu.recalculatePositions();
+
 		return md;
 		
 	}
@@ -64,17 +62,15 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		BlockStmt newBlockStmt = new BlockStmt();
 		NodeList<Statement> originalBlockStmt = md.getBody().get().getStatements();
 
-		for (int i = 0; i < originalBlockStmt.size(); i++) {
-			if (utilityCallsMap.containsKey(originalBlockStmt.get(i).getRange().get().begin.line)) {
-
-				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(originalBlockStmt.get(i).getRange().get().begin.line));
-				NodeList<Statement> newStatements = utilityMethodBody.getStatements();
-				newBlockStmt.getStatements().addAll(newStatements);
-
+		originalBlockStmt.stream().forEach(st -> {
+			if (utilityCallsMap.containsKey(st.getRange().get().begin.line)) {
+				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(st.getRange().get().begin.line));
+				NodeList<Statement> replacementStatements = utilityMethodBody.getStatements();
+				newBlockStmt.getStatements().addAll(replacementStatements);
 			} else {
-				newBlockStmt.getStatements().add(originalBlockStmt.get(i));
+				newBlockStmt.getStatements().add(st);
 			}
-		}
+		});
 
 		md.replace(md.getBody().get(), newBlockStmt);
 

@@ -1,13 +1,10 @@
 package seham.phd.synthesis.code.concise;
 
-import javax.swing.JFrame;		
+import javax.swing.JFrame;			
 
 import seham.phd.synthesis.annotations.*;
 
 public class JFrameExample {
-	
-	public static int ONE_BILLION = 1000000000;
-	public static int TWO_BILLION = 2_000_000_000;
 
 	@Documentation
 	public void docFrameWithoutTitle() {
