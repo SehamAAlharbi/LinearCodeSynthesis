@@ -48,46 +48,86 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 //		visitor.getDocumentationMethods().stream().forEach(method -> modifyMethod(method, visitor));
 		
 		// here I am just experimenting with one method doc
-		MethodDeclaration md = modifyMethod(visitor.getDocumentationMethods().get(0), visitor);
+		MethodDeclaration md = visitor.getDocumentationMethods().get(0);
+		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
+		
+		modifyMethod (md,utilityCallsMap,visitor);
+		
 		cu.recalculatePositions();
 		return md;
 		
 	}
 	
-	private MethodDeclaration modifyMethod ( MethodDeclaration md, MethodDeclarationVisitor visitor) {
-		
-		super.visit(md, null);
-		
-		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
+	private MethodDeclaration modifyMethod ( MethodDeclaration md, Map<MethodDeclaration, Integer> utilityCallsMap, MethodDeclarationVisitor visitor) {
+
 		BlockStmt newBlockStmt = new BlockStmt();
-		
+		System.out.println(utilityCallsMap.size());
+		if (utilityCallsMap.isEmpty()) {
+			return md;
+		}
 
-		
-		utilityCallsMap.keySet().forEach(k -> {
+		else {
+
 			
-			    // clone each utility method body
+			
+			utilityCallsMap.keySet().forEach(k -> {
+				
 				BlockStmt utilityMethodBody = cloneBody(k);
-
-				// Iterate over @Param utilityMethod body and embed statements to @Param md body
-				NodeList<Statement> newStatements =  utilityMethodBody.getStatements();
+				NodeList<Statement> newStatements = utilityMethodBody.getStatements();
 				
 				NodeList<Statement> originalStatements = md.getBody().get().getStatements();
-				for (int i=0 ; i<originalStatements.size() ;i++) {
+				
+				for (int i = 0; i < originalStatements.size(); i++) {
 					
 					if (originalStatements.get(i).getRange().get().begin.line == utilityCallsMap.get(k)) {
 
 						newBlockStmt.getStatements().addAll(newStatements);
+						
 
 					} else {
 						newBlockStmt.getStatements().add(originalStatements.get(i));
 					}
+
 				}
 				
+				md.replace(md.getBody().get(), newBlockStmt);
+				modifyMethod(md,visitor.locateUtilityCalls(md),visitor);
+				
+				
 
-		});
+			});
+
+		}
 		
-		md.replace(md.getBody().get(), newBlockStmt);
-		
+//		BlockStmt newBlockStmt = new BlockStmt();
+//		
+//		
+//		utilityCallsMap.keySet().forEach(k -> {
+//			
+//			    // clone each utility method body
+//				BlockStmt utilityMethodBody = cloneBody(k);
+//
+//				// Iterate over @Param utilityMethod body and embed statements to @Param md body
+//				NodeList<Statement> newStatements =  utilityMethodBody.getStatements();
+//				
+//				NodeList<Statement> originalStatements = md.getBody().get().getStatements();
+//				for (int i=0 ; i<originalStatements.size() ;i++) {
+//					
+//					if (originalStatements.get(i).getRange().get().begin.line == utilityCallsMap.get(k)) {
+//
+//						newBlockStmt.getStatements().addAll(newStatements);
+//						
+//
+//					} else {
+//						newBlockStmt.getStatements().add(originalStatements.get(i));
+//					}
+//				}
+//				
+//
+//		});
+//		
+//		md.replace(md.getBody().get(), newBlockStmt);
+
 		return md;
 		
 	}
