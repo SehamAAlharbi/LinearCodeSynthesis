@@ -67,14 +67,14 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	 * @return a map of the whole utility MethodDeclaration node and the line number of its call in source code
 	 * 
 	 */
-	public Map<MethodDeclaration, Integer> locateUtilityCalls(MethodDeclaration documentationMethod) {
+	public Map<Integer, MethodDeclaration> locateUtilityCalls(MethodDeclaration documentationMethod) {
 
-		Map<MethodDeclaration, Integer> utilityCalls = new HashMap<MethodDeclaration, Integer>();
+		Map<Integer, MethodDeclaration> utilityCalls = new HashMap<Integer, MethodDeclaration>();
 
 		documentationMethod.findAll(MethodCallExpr.class).forEach(mce -> {
 			if (isUtilityMethodCall(mce)) {
 				MethodDeclaration utilityMethod = utilityMethods.stream().filter(md -> md.getNameAsString().equals(mce.getNameAsString())).findAny().orElse(null);
-				utilityCalls.put(utilityMethod, mce.getName().getBegin().get().line);
+				utilityCalls.put(mce.getName().getBegin().get().line, utilityMethod);
 			}
 		});
 

@@ -3,6 +3,7 @@ package seham.phd.synthesis.modifiers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.CompilationUnit;
@@ -49,87 +50,36 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 		// here I am just experimenting with one method doc
 		MethodDeclaration md = visitor.getDocumentationMethods().get(0);
-		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
+		Map<Integer, MethodDeclaration > utilityCallsMap = visitor.locateUtilityCalls(md);
 		
-		modifyMethod (md,utilityCallsMap,visitor);
+		modifyMethod (md,utilityCallsMap);
 		
 		cu.recalculatePositions();
 		return md;
 		
 	}
 	
-	private MethodDeclaration modifyMethod ( MethodDeclaration md, Map<MethodDeclaration, Integer> utilityCallsMap, MethodDeclarationVisitor visitor) {
+	private MethodDeclaration modifyMethod(MethodDeclaration md, Map<Integer, MethodDeclaration> utilityCallsMap) {
 
 		BlockStmt newBlockStmt = new BlockStmt();
-		System.out.println(utilityCallsMap.size());
-		if (utilityCallsMap.isEmpty()) {
-			return md;
-		}
+		NodeList<Statement> originalBlockStmt = md.getBody().get().getStatements();
 
-		else {
+		for (int i = 0; i < originalBlockStmt.size(); i++) {
+			if (utilityCallsMap.containsKey(originalBlockStmt.get(i).getRange().get().begin.line)) {
 
-			
-			
-			utilityCallsMap.keySet().forEach(k -> {
-				
-				BlockStmt utilityMethodBody = cloneBody(k);
+				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(originalBlockStmt.get(i).getRange().get().begin.line));
 				NodeList<Statement> newStatements = utilityMethodBody.getStatements();
-				
-				NodeList<Statement> originalStatements = md.getBody().get().getStatements();
-				
-				for (int i = 0; i < originalStatements.size(); i++) {
-					
-					if (originalStatements.get(i).getRange().get().begin.line == utilityCallsMap.get(k)) {
+				newBlockStmt.getStatements().addAll(newStatements);
 
-						newBlockStmt.getStatements().addAll(newStatements);
-						
-
-					} else {
-						newBlockStmt.getStatements().add(originalStatements.get(i));
-					}
-
-				}
-				
-				md.replace(md.getBody().get(), newBlockStmt);
-				modifyMethod(md,visitor.locateUtilityCalls(md),visitor);
-				
-				
-
-			});
-
+			} else {
+				newBlockStmt.getStatements().add(originalBlockStmt.get(i));
+			}
 		}
-		
-//		BlockStmt newBlockStmt = new BlockStmt();
-//		
-//		
-//		utilityCallsMap.keySet().forEach(k -> {
-//			
-//			    // clone each utility method body
-//				BlockStmt utilityMethodBody = cloneBody(k);
-//
-//				// Iterate over @Param utilityMethod body and embed statements to @Param md body
-//				NodeList<Statement> newStatements =  utilityMethodBody.getStatements();
-//				
-//				NodeList<Statement> originalStatements = md.getBody().get().getStatements();
-//				for (int i=0 ; i<originalStatements.size() ;i++) {
-//					
-//					if (originalStatements.get(i).getRange().get().begin.line == utilityCallsMap.get(k)) {
-//
-//						newBlockStmt.getStatements().addAll(newStatements);
-//						
-//
-//					} else {
-//						newBlockStmt.getStatements().add(originalStatements.get(i));
-//					}
-//				}
-//				
-//
-//		});
-//		
-//		md.replace(md.getBody().get(), newBlockStmt);
+
+		md.replace(md.getBody().get(), newBlockStmt);
 
 		return md;
-		
+
 	}
 	
 	public int getInsertionPosition (int lineNumber) {
