@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.Visitable;
 
 import seham.phd.synthesis.visitors.MethodDeclarationVisitor;
@@ -61,6 +62,7 @@ public class MethodDeclarationModifierTest {
 		modifier.modifyAllDocMethods(cu, visitor);
 		
 		System.out.println(cu.toString());
+		
 		
 	}
 	

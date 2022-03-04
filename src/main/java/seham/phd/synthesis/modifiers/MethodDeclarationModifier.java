@@ -54,15 +54,14 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		
 	}
 	
-	private MethodDeclaration modifyMethod (MethodDeclaration md, MethodDeclarationVisitor visitor) {
+	private MethodDeclaration modifyMethod ( MethodDeclaration md, MethodDeclarationVisitor visitor) {
 		
 		super.visit(md, null);
 		
-		
 		Map<MethodDeclaration, Integer> utilityCallsMap = visitor.locateUtilityCalls(md);
-		BlockStmt newDocMethodBody = md.getBody().get().clone();
-		List <Integer> nodesToRemove = new ArrayList <Integer> ();
-		List <Integer> nodesToKeep = new ArrayList <Integer> ();
+		BlockStmt newBlockStmt = new BlockStmt();
+		
+
 		
 		utilityCallsMap.keySet().forEach(k -> {
 			
@@ -70,34 +69,24 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 				BlockStmt utilityMethodBody = cloneBody(k);
 
 				// Iterate over @Param utilityMethod body and embed statements to @Param md body
-				NodeList<Statement> statements =  utilityMethodBody.getStatements();
-			
-				md.getBody().get().getChildNodes().forEach(node -> {
-					
-					int index;
-					
-					if (node.getRange().get().begin.line == utilityCallsMap.get(k)) {
-						
-						index = md.getBody().get().getChildNodes().indexOf(node);
-						newDocMethodBody.getStatement(index).remove();
-						newDocMethodBody.getStatements().addAll(index, statements);
-//						statements.stream().forEach(st -> newDocMethodBody.getStatements().add(index, st));
-					}
-					
+				NodeList<Statement> newStatements =  utilityMethodBody.getStatements();
 				
-				});
+				NodeList<Statement> originalStatements = md.getBody().get().getStatements();
+				for (int i=0 ; i<originalStatements.size() ;i++) {
+					
+					if (originalStatements.get(i).getRange().get().begin.line == utilityCallsMap.get(k)) {
 
+						newBlockStmt.getStatements().addAll(newStatements);
+
+					} else {
+						newBlockStmt.getStatements().add(originalStatements.get(i));
+					}
+				}
+				
 
 		});
 		
-		
-////		 iterate to remove and add
-//		nodesToRemove.stream().forEach(index -> {
-//			newDocMethodBody.getStatements().get(index).remove();
-//			statements.stream().forEach(st -> md.getBody().get().getStatements().add(index, st));
-//		});
-		
-		md.replace(md.getBody().get(), newDocMethodBody);
+		md.replace(md.getBody().get(), newBlockStmt);
 		
 		return md;
 		
