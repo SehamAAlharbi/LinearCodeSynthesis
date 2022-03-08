@@ -26,17 +26,13 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	public CompilationUnit parseOriginal(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
-
 		return cu;
-
 	}
 
 	public CompilationUnit parseClone(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
-
 		return cu.clone();
-
 	}
 
 	public MethodDeclarationVisitor() {
@@ -48,23 +44,18 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 		super.visit(md, arg);
 		allMethodDeclarations.add(md);
-
 	}
 
 	public ArrayList<MethodDeclaration> getAllMethodDeclarations() {
-
 		return this.allMethodDeclarations;
 	}
 
 	public ArrayList<MethodDeclaration> getUtilityMethods() {
-
 		return this.utilityMethods;
 	}
 
 	public ArrayList<MethodDeclaration> getDocumentationMethods() {
-
 		return this.documentationMethods;
-
 	}
 
 	/**
@@ -92,17 +83,13 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 	}
 
 	public void locateUtilityMethods() {
-
 		utilityMethods.addAll(allMethodDeclarations.stream()
 				.filter(declaration -> declaration.isAnnotationPresent("Utility")).collect(Collectors.toList()));
-
 	}
 
 	public void locateDocumentationMethods() {
-
 		documentationMethods.addAll(allMethodDeclarations.stream()
 				.filter(declaration -> declaration.isAnnotationPresent("Documentation")).collect(Collectors.toList()));
-
 	}
 
 	private boolean isUtilityMethodCall(MethodCallExpr methodCall) {
@@ -112,7 +99,6 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		if (isFound != null) {
 			return true;
 		}
-
 		return false;
 	}
 
@@ -123,7 +109,6 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 		if (isFound != null) {
 			return true;
 		}
-
 		return false;
 	}
 

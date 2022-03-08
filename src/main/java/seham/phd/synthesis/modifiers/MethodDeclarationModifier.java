@@ -14,7 +14,7 @@ import seham.phd.synthesis.visitors.MethodDeclarationVisitor;
 public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 	public MethodDeclarationModifier() {
-
+		
 	}
 
 	@Override
