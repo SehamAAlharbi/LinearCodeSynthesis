@@ -19,10 +19,8 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 	@Override
 	public MethodDeclaration visit(MethodDeclaration md, Void arg) {
-
 		super.visit(md, arg);
 		return md;
-
 	}
 
 	public BlockStmt removeNode(BlockStmt bs, int index) {
@@ -32,7 +30,6 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		// What if I want to remove a node of a certain type ?
 		bs.getStatements().get(index).remove();
 		return bs;
-
 	}
 
 	public void modifyAllDocMethods(MethodDeclarationVisitor visitor) {
@@ -40,7 +37,6 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		visitor.getDocumentationMethods().stream().forEach(method -> {
 			modifyMethod(method, visitor.locateUtilityCalls(method));
 		});
-
 	}
 
 	private MethodDeclaration modifyMethod(MethodDeclaration md, Map<Integer, MethodDeclaration> utilityCallsMap) {
@@ -61,7 +57,6 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		md.replace(md.getBody().get(), newBlockStmt);
 
 		return md;
-
 	}
 
 	public int getInsertionPosition(int lineNumber) {
