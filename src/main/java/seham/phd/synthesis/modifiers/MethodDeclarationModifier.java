@@ -34,7 +34,9 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 	public void modifyAllDocMethods(MethodDeclarationVisitor visitor) {
 
-		visitor.getDocumentationMethods().stream().forEach(method -> {
+		visitor.getDocumentationMethods()
+		.stream()
+		.forEach(method -> {
 			modifyMethod(method, visitor.locateUtilityCalls(method));
 		});
 	}
@@ -44,7 +46,8 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		BlockStmt newBlockStmt = new BlockStmt();
 		NodeList<Statement> originalBlockStmt = md.getBody().get().getStatements();
 
-		originalBlockStmt.stream().forEach(st -> {
+		originalBlockStmt.stream()
+		.forEach(st -> {
 			if (utilityCallsMap.containsKey(st.getRange().get().begin.line)) {
 				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(st.getRange().get().begin.line));
 				NodeList<Statement> replacementStatements = utilityMethodBody.getStatements();
