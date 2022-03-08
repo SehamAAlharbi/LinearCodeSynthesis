@@ -17,13 +17,13 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 
 	}
 
-//	@Override
-//	public MethodDeclaration visit(MethodDeclaration md, Void arg) {
-//		
-//		super.visit(md, arg);
-//		return md;
-//
-//	}
+	@Override
+	public MethodDeclaration visit(MethodDeclaration md, Void arg) {
+
+		super.visit(md, arg);
+		return md;
+
+	}
 
 	public BlockStmt removeNode(BlockStmt bs, int index) {
 
@@ -67,9 +67,7 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 	public int getInsertionPosition(int lineNumber) {
 
 		int position = 0;
-
 		// specify insertion position, using line no?
-
 		return position;
 	}
 
