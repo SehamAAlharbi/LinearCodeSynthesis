@@ -1,6 +1,6 @@
 package seham.phd.synthesis.visitors;
 
-import java.io.File;		
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,33 +17,40 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
-
 public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	private ArrayList<MethodDeclaration> allMethodDeclarations = new ArrayList<MethodDeclaration>();
 	private ArrayList<MethodDeclaration> utilityMethods = new ArrayList<MethodDeclaration>();
 	private ArrayList<MethodDeclaration> documentationMethods = new ArrayList<MethodDeclaration>();
 
-	public CompilationUnit parse(File file) throws FileNotFoundException {
+	public CompilationUnit parseOriginal(File file) throws FileNotFoundException {
 
 		CompilationUnit cu = StaticJavaParser.parse(file);
-	
+
 		return cu;
 
 	}
-	
+
+	public CompilationUnit parseClone(File file) throws FileNotFoundException {
+
+		CompilationUnit cu = StaticJavaParser.parse(file);
+
+		return cu.clone();
+
+	}
+
 	public MethodDeclarationVisitor() {
 		super();
 	}
 
 	@Override
 	public void visit(MethodDeclaration md, Void arg) {
-		
+
 		super.visit(md, arg);
 		allMethodDeclarations.add(md);
-		
+
 	}
-	
+
 	public ArrayList<MethodDeclaration> getAllMethodDeclarations() {
 
 		return this.allMethodDeclarations;
@@ -60,11 +67,13 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 	}
 
-
 	/**
-	 * Given a documentation method, it analysis its body and look for any utility MethodCallExpr
+	 * Given a documentation method, it analysis its body and look for any utility
+	 * MethodCallExpr
+	 * 
 	 * @param documentationMethod to be analysed
-	 * @return a map of the whole utility MethodDeclaration node and the line number of its call in source code
+	 * @return a map of the whole utility MethodDeclaration node and the line number
+	 *         of its call in source code
 	 * 
 	 */
 	public Map<Integer, MethodDeclaration> locateUtilityCalls(MethodDeclaration documentationMethod) {
@@ -73,7 +82,8 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 		documentationMethod.findAll(MethodCallExpr.class).forEach(mce -> {
 			if (isUtilityMethodCall(mce)) {
-				MethodDeclaration utilityMethod = utilityMethods.stream().filter(md -> md.getNameAsString().equals(mce.getNameAsString())).findAny().orElse(null);
+				MethodDeclaration utilityMethod = utilityMethods.stream()
+						.filter(md -> md.getNameAsString().equals(mce.getNameAsString())).findAny().orElse(null);
 				utilityCalls.put(mce.getName().getBegin().get().line, utilityMethod);
 			}
 		});
@@ -116,12 +126,11 @@ public class MethodDeclarationVisitor extends VoidVisitorAdapter<Void> {
 
 		return false;
 	}
-	
+
 	public void printUsingDot(CompilationUnit cu, String fileName) throws IOException {
-		
+
 		DotPrinter printer = new DotPrinter(true);
-		try (FileWriter fileWriter = new FileWriter(fileName);
-				PrintWriter printWriter = new PrintWriter(fileWriter)) {
+		try (FileWriter fileWriter = new FileWriter(fileName); PrintWriter printWriter = new PrintWriter(fileWriter)) {
 			printWriter.print(printer.output(cu));
 		}
 	}

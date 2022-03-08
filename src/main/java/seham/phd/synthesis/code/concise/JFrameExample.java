@@ -2,6 +2,7 @@ package seham.phd.synthesis.code.concise;
 
 import javax.swing.JFrame;			
 
+
 import seham.phd.synthesis.annotations.*;
 
 public class JFrameExample {
@@ -18,6 +19,7 @@ public class JFrameExample {
 	public void docFrameWithTitle() {
 		JFrame frame = createJFrame(true);
 		show(frame);
+	
 	}
 
 	@Utility

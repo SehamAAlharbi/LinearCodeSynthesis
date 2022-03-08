@@ -1,6 +1,6 @@
 package seham.phd.synthesis.visitors;
 
-import static org.junit.Assert.assertEquals;		
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -21,10 +21,11 @@ public class MethodDeclarationVisitorTest {
 	final static String FILE_PATH = "src/main/java/seham/phd/synthesis/code/concise/JFrameExample.java";
 	static File file;
 	static MethodDeclarationVisitor visitor;
-	
+
 	/**
 	 * code executed before all test methods, executed once only, e.g DB connection
 	 * or instance creation
+	 * 
 	 * @throws FileNotFoundException
 	 */
 	@BeforeClass
@@ -33,7 +34,7 @@ public class MethodDeclarationVisitorTest {
 		file = new File(FILE_PATH);
 
 	}
-	
+
 	/**
 	 * code executed before each test methods, code that needed to be executed
 	 * repeatedly before each method
@@ -46,15 +47,23 @@ public class MethodDeclarationVisitorTest {
 	}
 
 	@Test
-	public void testParse() throws FileNotFoundException {
+	public void testParseOriginal() throws FileNotFoundException {
 
-		CompilationUnit cu = visitor.parse(file);
+		CompilationUnit cu = visitor.parseOriginal(file);
 		if (cu != null) {
-			System.out.println("File Parsed Correctly! \n ");
+			System.out.println("File parsed correctly!");
 		}
-
 //		System.out.println(cu.toString());
+	}
 
+	@Test
+	public void testParseClone() throws FileNotFoundException {
+
+		CompilationUnit cu = visitor.parseClone(file);
+		if (cu != null) {
+			System.out.println("File parsed and cloned correctly!");
+		}
+//		System.out.println(cu.toString());
 	}
 
 	@Test
@@ -62,7 +71,7 @@ public class MethodDeclarationVisitorTest {
 
 		int size = 4;
 
-		CompilationUnit cu = visitor.parse(file);
+		CompilationUnit cu = visitor.parseOriginal(file);
 		visitor.visit(cu, null);
 		int actualSize = visitor.getAllMethodDeclarations().size();
 		assertEquals(size, actualSize);
@@ -73,7 +82,7 @@ public class MethodDeclarationVisitorTest {
 	@Test
 	public void testGetUtilityMethods() throws FileNotFoundException {
 
-		CompilationUnit cu = visitor.parse(file);
+		CompilationUnit cu = visitor.parseOriginal(file);
 		visitor.visit(cu, null);
 		visitor.locateUtilityMethods();
 		int actualSize = visitor.getUtilityMethods().size();
@@ -85,7 +94,7 @@ public class MethodDeclarationVisitorTest {
 	@Test
 	public void testGetDocumentationMethods() throws FileNotFoundException {
 
-		CompilationUnit cu = visitor.parse(file);
+		CompilationUnit cu = visitor.parseOriginal(file);
 		visitor.visit(cu, null);
 		visitor.locateDocumentationMethods();
 		int actualSize = visitor.getDocumentationMethods().size();
@@ -93,17 +102,17 @@ public class MethodDeclarationVisitorTest {
 		System.out.println("Number of Documentation Methods: " + actualSize);
 
 	}
-	
-	@Test 
-	public void testPrintUsingDot () throws IOException {
-		
-		CompilationUnit cu = visitor.parse(file);
+
+	@Test
+	public void testPrintUsingDot() throws IOException {
+
+		CompilationUnit cu = visitor.parseOriginal(file);
 		visitor.printUsingDot(cu, "ast.dot");
 	}
 
 	/**
 	 * code executed after each test method, code executed repeatedly after other
-	 test methods
+	 * test methods
 	 */
 	@After
 	public void tearDown() {
