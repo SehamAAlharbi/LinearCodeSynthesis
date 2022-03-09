@@ -32,7 +32,7 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		return bs;
 	}
 
-	public void modifyAllDocMethods(MethodDeclarationVisitor visitor) {
+	public void inlineAll(MethodDeclarationVisitor visitor) {
 
 		visitor.getDocumentationMethods()
 		.stream()
