@@ -47,13 +47,19 @@ public class MethodDeclarationModifier extends ModifierVisitor<Void> {
 		NodeList<Statement> originalBlockStmt = md.getBody().get().getStatements();
 
 		originalBlockStmt.stream()
-		.forEach(st -> {
-			if (utilityCallsMap.containsKey(st.getRange().get().begin.line)) {
-				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(st.getRange().get().begin.line));
+		.forEach(originalStmt -> {
+			if (utilityCallsMap.containsKey(originalStmt.getRange().get().begin.line)) {
+				BlockStmt utilityMethodBody = cloneBody(utilityCallsMap.get(originalStmt.getRange().get().begin.line));
 				NodeList<Statement> replacementStatements = utilityMethodBody.getStatements();
-				newBlockStmt.getStatements().addAll(replacementStatements);
+				
+				// filtering out return statements
+				replacementStatements.stream().forEach(UtilityStmt -> {
+					if(!UtilityStmt.isReturnStmt()) {
+						newBlockStmt.getStatements().add(UtilityStmt);
+					}
+				});
 			} else {
-				newBlockStmt.getStatements().add(st);
+				newBlockStmt.getStatements().add(originalStmt);
 			}
 		});
 
